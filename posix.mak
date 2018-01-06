@@ -1,5 +1,6 @@
 DMD_DIR = ../dmd
-DMD = $(DMD_DIR)/generated/$(OS)/release/$(MODEL)/dmd
+BUILD=release
+DMD = $(DMD_DIR)/generated/$(OS)/$(BUILD)/$(MODEL)/dmd
 CC = gcc
 INSTALL_DIR = ../install
 DRUNTIME_PATH = ../druntime
@@ -27,14 +28,19 @@ endif
 
 # Set PHOBOS name and full path
 ifeq (,$(findstring win,$(OS)))
-	PHOBOS = $(PHOBOS_PATH)/generated/$(OS)/release/$(MODEL)/libphobos2.a
-	PHOBOSSO = $(PHOBOS_PATH)/generated/$(OS)/release/$(MODEL)/libphobos2.so
+	PHOBOS = $(PHOBOS_PATH)/generated/$(OS)/$(DEBUG)/$(MODEL)/libphobos2.a
+	PHOBOSSO = $(PHOBOS_PATH)/generated/$(OS)/$(DEBUG)/$(MODEL)/libphobos2.so
 endif
 
 # default include/link paths, override by setting DFLAGS (e.g. make -f posix.mak DFLAGS=-I/foo)
 DFLAGS = -I$(DRUNTIME_PATH)/import -I$(PHOBOS_PATH) \
-		 -L-L$(PHOBOS_PATH)/generated/$(OS)/release/$(MODEL) $(MODEL_FLAG)
-DFLAGS += -w -de -fPIC
+		 -L-L$(PHOBOS_PATH)/generated/$(OS)/$(DEBUG)/$(MODEL) $(MODEL_FLAG)
+#DFLAGS += -w -de -fPIC
+DFLAGS += -w -dw -fPIC
+
+ifeq (dragonflybsd,$(OS))
+        DFLAGS += -L-L/usr/local/lib
+endif
 
 # Default DUB flags (DUB uses a different architecture format)
 DUBFLAGS = --arch=$(subst 32,x86,$(subst 64,x86_64,$(MODEL)))
